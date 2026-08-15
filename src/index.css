@@ -1,0 +1,32 @@
+@import "tailwindcss";
+
+@theme {
+  --color-brand-deep: #023e8a; /* Darker blue for deep borders/accents */
+  --color-brand-neon: #0077b6; /* The requested 0077b6 for glows and active states */
+  --color-brand-neon-light: #48cae4; /* Lighter blue for hover states */
+  --color-brand-neon-dark: #0096c7; /* Slightly darker than neon for gradients */
+  
+  --color-background-black: #000000;
+  --color-surface-dark: #0a0a0a;
+  --color-surface-mid: #121212;
+  --color-border-dark: #1f1f1f;
+}
+
+body {
+  @apply bg-background-black text-white min-h-screen font-sans;
+}
+
+/* Custom Scrollbar for a premium feel */
+::-webkit-scrollbar {
+  width: 6px;
+}
+::-webkit-scrollbar-track {
+  background: transparent; 
+}
+::-webkit-scrollbar-thumb {
+  background: #0077b6; 
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #d946ef; 
+}
