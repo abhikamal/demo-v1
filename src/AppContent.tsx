@@ -1,15 +1,17 @@
-import { Coins, LayoutDashboard, Store, User } from 'lucide-react'
+import { Coins, LayoutDashboard, Store, User, LogOut, LogIn, UserPlus } from 'lucide-react'
 import Home from './views/Home'
 import GameLab from './views/GameLab'
 import CostEstimation from './views/CostEstimation'
 import CoinMarket from './views/CoinMarket'
 import ArcadeLounge from './views/ArcadeLounge'
+import Login from './views/Login'
+import Signup from './views/Signup'
 import { useAppContext } from './context/AppContext'
 
-export type View = 'home' | 'lab' | 'estimate' | 'market' | 'arcade';
+export type View = 'home' | 'lab' | 'estimate' | 'market' | 'arcade' | 'login' | 'signup';
 
 function AppContent() {
-  const { currentView, navigateTo, coinBalance } = useAppContext();
+  const { currentView, navigateTo, coinBalance, user, logout } = useAppContext();
 
   return (
     <div className="min-h-screen bg-background-black text-white font-sans flex flex-col">
@@ -52,11 +54,41 @@ function AppContent() {
                 <Store size={20} />
               </button>
 
-              <div className="flex items-center space-x-2 pl-4 border-l border-brand-deep">
-                <div className="w-8 h-8 rounded-full bg-brand-deep flex items-center justify-center text-brand-neon">
-                  <User size={16} />
-                </div>
-                <span className="text-sm font-medium text-gray-200 hidden md:block">Abhinav</span>
+              <div className="flex items-center space-x-3 pl-4 border-l border-brand-deep">
+                {user ? (
+                  <>
+                    <div className="flex items-center space-x-2 bg-brand-deep/30 rounded-full pr-3 border border-brand-deep">
+                      <div className="w-8 h-8 rounded-full bg-brand-deep flex items-center justify-center text-brand-neon">
+                        <User size={16} />
+                      </div>
+                      <span className="text-sm font-medium text-gray-200 hidden md:block">{user.name}</span>
+                    </div>
+                    <button 
+                      onClick={logout}
+                      className="p-2 text-gray-400 hover:text-red-400 transition-colors"
+                      title="Logout"
+                    >
+                      <LogOut size={18} />
+                    </button>
+                  </>
+                ) : (
+                  <>
+                    <button 
+                      onClick={() => navigateTo('login')}
+                      className="flex items-center space-x-1 text-sm font-medium text-gray-300 hover:text-brand-neon transition-colors px-2 py-1"
+                    >
+                      <LogIn size={16} />
+                      <span className="hidden sm:inline">Sign In</span>
+                    </button>
+                    <button 
+                      onClick={() => navigateTo('signup')}
+                      className="flex items-center space-x-1 text-sm font-medium bg-brand-neon text-background-black hover:bg-brand-neon-light transition-colors px-3 py-1.5 rounded-md"
+                    >
+                      <UserPlus size={16} />
+                      <span className="hidden sm:inline">Sign Up</span>
+                    </button>
+                  </>
+                )}
               </div>
             </div>
           </div>
@@ -70,6 +102,8 @@ function AppContent() {
         {currentView === 'estimate' && <CostEstimation />}
         {currentView === 'market' && <CoinMarket />}
         {currentView === 'arcade' && <ArcadeLounge />}
+        {currentView === 'login' && <Login />}
+        {currentView === 'signup' && <Signup />}
       </main>
     </div>
   )

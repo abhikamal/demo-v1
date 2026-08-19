@@ -8,13 +8,10 @@ export interface Message {
   text: string;
 }
 
-const INITIAL_MESSAGES: Message[] = [
-  { 
-    id: '1', 
-    sender: 'ai', 
-    text: 'Hello Abhinav! I am Croevo AI. What kind of game would you like to create today?' 
-  }
-];
+export interface UserProfile {
+  name: string;
+  email: string;
+}
 
 interface AppContextType {
   currentView: View;
@@ -28,14 +25,30 @@ interface AppContextType {
   isGeneratingGame: boolean;
   setIsGeneratingGame: (isGenerating: boolean) => void;
   resetProject: () => void;
+  user: UserProfile | null;
+  login: (name: string, email: string) => void;
+  logout: () => void;
 }
 
 const AppContext = createContext<AppContextType | undefined>(undefined);
 
 export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
+  const [user, setUser] = useState<UserProfile | null>(() => {
+    const savedUser = localStorage.getItem('croevo_auth_user');
+    return savedUser ? JSON.parse(savedUser) : null;
+  });
   const [currentView, setCurrentView] = useState<View>('home');
   const [coinBalance, setCoinBalance] = useState<number>(100);
-  const [chatMessages, setChatMessages] = useState<Message[]>(INITIAL_MESSAGES);
+  
+  const getInitialMessages = (userName?: string): Message[] => [
+    { 
+      id: '1', 
+      sender: 'ai', 
+      text: `Hello ${userName || 'Guest'}! I am Croevo AI. What kind of game would you like to create today?` 
+    }
+  ];
+
+  const [chatMessages, setChatMessages] = useState<Message[]>(getInitialMessages(user?.name));
   const [showEstimateButton, setShowEstimateButton] = useState(false);
   const [isGeneratingGame, setIsGeneratingGame] = useState(false);
 
@@ -43,9 +56,24 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
   const addMessage = (msg: Message) => setChatMessages(prev => [...prev, msg]);
   
   const resetProject = () => {
-    setChatMessages(INITIAL_MESSAGES);
+    setChatMessages(getInitialMessages(user?.name));
     setShowEstimateButton(false);
     setIsGeneratingGame(false);
+    setCurrentView('home');
+  };
+
+  const login = (name: string, email: string) => {
+    const newUser = { name, email };
+    setUser(newUser);
+    localStorage.setItem('croevo_auth_user', JSON.stringify(newUser));
+    setChatMessages(getInitialMessages(name));
+    setCurrentView('home');
+  };
+
+  const logout = () => {
+    setUser(null);
+    localStorage.removeItem('croevo_auth_user');
+    setChatMessages(getInitialMessages('Guest'));
     setCurrentView('home');
   };
 
@@ -56,7 +84,8 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
       chatMessages, addMessage,
       showEstimateButton, setShowEstimateButton,
       isGeneratingGame, setIsGeneratingGame,
-      resetProject
+      resetProject,
+      user, login, logout
     }}>
       {children}
     </AppContext.Provider>
